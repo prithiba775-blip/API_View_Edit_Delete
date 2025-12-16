@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+            const form = document.createElement("form");
+            form.id = "form";
+            form.style.maxWidth = "100%";
+            form.style.border = "2px solid gray";
+            form.style.borderRadius = "5px";
+            form.style.marginLeft = "20%"
+            form.style.marginRight = "20%"
+            form.style.marginTop = "5%";
+            form.style.backgroundColor = "lightGray"
+            document.body.appendChild(form);
+
+            const head = document.createElement("h2");
+            head.innerText = "Form";
+            head.style.textAlign = "center";
+            form.appendChild(head);
+
+            function editForm(name,id,text,inputName,id1){
+            name = document.createElement("label");
+            name.id = id;
+            name.htmlFor = id1;
+            name.innerText = text;
+            name.style.width = "100%";
+            name.style.marginLeft = "10%";
+            name.style.marginRight = "10%";
+            form.appendChild(name);
+            inputName = document.createElement("input");
+            inputName.id = id1;
+            inputName.style.width = "75%"
+            inputName.style.marginLeft = "10%";
+            inputName.style.marginTop = "2%";
+            inputName.style.marginBottom = "2%";
+            form.appendChild(inputName);
+            }
+            editForm("userId","userId","User Id","userIdIput","userIdIput");
+            editForm("title","title","Title","titleInput","titleInput");
+
+            const lblBody = document.createElement("label");
+            lblBody.id = "lblBody";
+            lblBody.htmlFor = "body";
+            lblBody.innerText = "Body";
+            lblBody.style.width = "100%";
+            lblBody.style.marginLeft = "10%";
+            lblBody.style.marginRight = "10%";
+            form.appendChild(lblBody)
+
+            const body = document.createElement("textarea");
+            body.id = "body";
+            body.style.width = "75%"
+            body.style.marginLeft = "10%";
+            body.style.marginTop = "2%";
+            body.style.marginBottom = "2%";
+            body.style.height = "100px"
+            form.appendChild(body);
+
+            const updateButton = document.createElement("button");
+            updateButton.type = "button";
+            updateButton.innerText = "Update";
+            updateButton.style.width = "20%";
+            updateButton.style.marginLeft = "40%";
+            updateButton.style.marginTop = "2%";
+            updateButton.style.marginBottom = "5%";
+            form.appendChild(updateButton);
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
+        .then(response =>  response.json())
+        .then(post => {
+            document.getElementById("userIdIput").value = post.userId;
+            document.getElementById("titleInput").value = post.title;
+            document.getElementById("body").value = post.body;
+        })
+        
+        updateButton.addEventListener("click", function(e){
+            e.preventDefault();
+            const updatedData = {
+                id: id,
+                userId: document.getElementById("userIdIput").value,
+                title: document.getElementById("titleInput").value,
+                body: document.getElementById("body").value
+            };
+            console.log(updatedData)
+            fetch(`https://jsonplaceholder.typicode.com/posts/${id}`,{
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(updatedData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem(`post_${id}`, JSON.stringify(data));
+                window.location.href = "index.html";
+            })
+        .catch(error => console.log(error));
+        })
+    </script>
+</body>
+</html>

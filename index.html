@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        const table = document.createElement("table");
+        table.id = "table";
+        table.style.width = "100%"
+        table.style.borderWidth = "1px";
+        table.style.borderStyle = "solid";
+        table.style.borderColor = "black";
+        table.style.borderCollapse = "collapse";
+        document.body.appendChild(table);
+        const tr = document.createElement("tr");
+        table.appendChild(tr);
+        function tableHead(id,text){
+            const name = document.createElement("th");
+            name.id = id;
+            name.textContent = text;
+            name.style.width="20%";
+            name.style.border = "1px";
+            name.style.borderStyle = "solid";
+            name.style.borderColor = "black";
+            tr.appendChild(name);
+        }
+        tableHead("id1","Id");
+        tableHead("userId","User Id");
+        tableHead("title","Title");
+        tableHead("body","Body");
+        tableHead("actions","Actions");        
+        
+        const tbody = document.createElement("tbody");
+        tbody.id = "tbody";
+        tbody.style.width = "100%"
+        tbody.style.borderWidth = "1px";
+        tbody.style.borderStyle = "solid";
+        tbody.style.borderColor = "black";
+        tbody.style.borderCollapse = "collapse";
+        table.appendChild(tbody);
+
+        fetch("https://jsonplaceholder.typicode.com/posts")
+        .then(response =>  response.json())
+        .then(data => {
+            data.forEach(post => {
+                const savedPost = localStorage.getItem(`post_${post.id}`);
+                if (savedPost) {
+                    post = JSON.parse(savedPost);
+                }
+                const tr = document.createElement("tr");
+                function tableData(name,text){
+                    name = document.createElement("td");
+                    name.innerText = text;
+                    name.style.border = "1px";
+                    name.style.borderStyle = "solid";
+                    name.style.borderColor = "black";
+                    name.style.paddingLeft = "10px"
+                    tr.appendChild(name);
+                }
+                tableData("td1",`${post.id}`);
+                tableData("td2",`${post.userId}`);
+                tableData("td3",`${post.title}`);
+                tableData("td4",`${post.body}`);
+                const td = document.createElement("td");
+                td.style.border = "1px";
+                td.style.borderStyle = "solid";
+                td.style.borderColor = "black";
+                const viewBtn = document.createElement("button");
+                viewBtn.innerText = "View";
+                viewBtn.style.marginLeft = "5%";
+                viewBtn.addEventListener("click",function(){
+                alert(`User Id: ${post.userId},
+
+Title: ${post.title},
+
+Body: ${post.body}`)
+                })
+                td.appendChild(viewBtn);
+                
+                const editBtn = document.createElement("button");
+                editBtn.innerText = "Edit";
+                editBtn.style.marginLeft = "5%";
+                editBtn.addEventListener("click",function(){
+                    window.location.href=`view.html?id=${post.id}`;
+                })
+                td.appendChild(editBtn)
+                const deleteBtn = document.createElement("button");
+                deleteBtn.innerText = "Delete";
+                deleteBtn.style.marginLeft = "5%";
+
+                deleteBtn.addEventListener("click", function(){
+                    if(!confirm("Are you sure you want to delete this post?")) return;
+
+                    fetch(`https://jsonplaceholder.typicode.com/posts/${post.id}`,{
+                    method: "DELETE"
+                    })
+                    .then (response =>{
+                        if(response.ok) tr.remove();
+                    })
+                    .catch(error => console.log("Error:",error))
+                })
+                td.appendChild(deleteBtn);
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+
+            })
+
+        })
+        .catch(error => console.log("Error",error))
+        
+    </script>
+</body>
+</html>
